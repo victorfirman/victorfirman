@@ -1,0 +1,8 @@
+# Batch keywords — one per line. Lines starting with # are ignored.
+# Put the location in each line, OR pass --city to geocode one place for all of them.
+# Run:  python3 scripts/scrape.py --keywords-file examples/queries.example.txt --city "Jakarta Selatan"
+# Tip: overlapping terms are fine — duplicate places are removed automatically.
+klinik gigi di Jakarta Selatan
+dokter gigi di Jakarta Selatan
+klinik ortodonti di Jakarta Selatan
+klinik estetika gigi di Jakarta Selatan

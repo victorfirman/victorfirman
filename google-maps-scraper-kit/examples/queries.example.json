@@ -1,0 +1,45 @@
+{
+  "_comment": "Reference request body for POST /api/v1/jobs. Copy the 'job' object and edit. Required fields: keywords, lat, lon (strings), max_time (seconds).",
+  "job": {
+    "name": "scrape saya",
+    "keywords": ["kedai kopi di Bandung"],
+    "lang": "id",
+    "zoom": 15,
+    "lat": "-6.9175",
+    "lon": "107.6191",
+    "fast_mode": false,
+    "radius": 10000,
+    "depth": 5,
+    "email": true,
+    "max_time": 600,
+    "proxies": null
+  },
+  "keyword_ideas": [
+    "klinik gigi di Jakarta Selatan",
+    "bengkel mobil di Surabaya",
+    "salon kecantikan di Medan",
+    "toko bangunan di Semarang",
+    "fotografer pernikahan di Yogyakarta",
+    "villa di Canggu Bali",
+    "laundry kiloan di Depok",
+    "kursus bahasa Inggris di Malang"
+  ],
+  "city_coordinates_cheatsheet": {
+    "Jakarta Pusat": ["-6.1862", "106.8341"],
+    "Jakarta Selatan": ["-6.2615", "106.8106"],
+    "Tangerang": ["-6.1783", "106.6319"],
+    "Bekasi": ["-6.2383", "106.9756"],
+    "Depok": ["-6.4025", "106.7942"],
+    "Bogor": ["-6.5971", "106.8060"],
+    "Bandung": ["-6.9175", "107.6191"],
+    "Semarang": ["-6.9667", "110.4167"],
+    "Yogyakarta": ["-7.7956", "110.3695"],
+    "Surabaya": ["-7.2575", "112.7521"],
+    "Malang": ["-7.9666", "112.6326"],
+    "Denpasar": ["-8.6705", "115.2126"],
+    "Medan": ["3.5952", "98.6722"],
+    "Palembang": ["-2.9761", "104.7754"],
+    "Balikpapan": ["-1.2379", "116.8529"],
+    "Makassar": ["-5.1477", "119.4327"]
+  }
+}
