@@ -1,0 +1,83 @@
+// Profiler — skema basis data.
+// Semua data tersimpan di PostgreSQL. Tidak ada penyimpanan sementara di memori.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  HR_ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  role               Role      @default(EMPLOYEE)
+  passwordHash       String
+  passwordChangedAt  DateTime  @default(now())
+  mustChangePassword Boolean   @default(false)
+  totpSecret         String?
+  totpEnabled        Boolean   @default(false)
+  failedLogins       Int       @default(0)
+  lockedUntil        DateTime?
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  sessions    Session[]
+  resetTokens PasswordResetToken[]
+}
+
+/// Sesi login disimpan di DB (di luar proses aplikasi) — restart server tidak
+/// mengeluarkan pengguna. `id` adalah hash SHA-256 dari token di cookie.
+model Session {
+  id          String   @id
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// true = password benar, tapi kode 2FA belum dimasukkan.
+  pending2fa  Boolean  @default(false)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  ip          String?
+  userAgent   String?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id // hash SHA-256 dari token di tautan email
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// Jejak audit. Hanya boleh INSERT — UPDATE/DELETE ditolak oleh trigger
+/// PostgreSQL (lihat migrasi `audit_log_immutable`).
+model AuditLog {
+  id        BigInt   @id @default(autoincrement())
+  at        DateTime @default(now())
+  /// Bukan relasi: log harus tetap utuh walau pengguna dihapus.
+  actorId   String?
+  action    String
+  targetType String?
+  targetId  String?
+  ip        String?
+  meta      Json?
+
+  @@index([actorId, at])
+  @@index([targetType, targetId, at])
+}

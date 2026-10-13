@@ -1,0 +1,45 @@
+# Deploy ke server warroom.
+# PORT: 8131 adalah usulan — CEK DULU di server bahwa port ini kosong
+#   (mis. `ss -ltnp | grep 8131`). Jangan 3000/8080/5000; 8120 dipakai gmt-fat-dashboard.
+services:
+  profiler-db:
+    image: postgres:16
+    container_name: profiler-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: profiler
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD di .env}
+      POSTGRES_DB: profiler
+    volumes:
+      - profiler-pgdata:/var/lib/postgresql/data
+    networks: [profiler-internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profiler"]
+      interval: 5s
+      retries: 10
+
+  profiler-app:
+    build: .
+    container_name: profiler-app
+    restart: unless-stopped
+    depends_on:
+      profiler-db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgresql://profiler:${POSTGRES_PASSWORD}@profiler-db:5432/profiler?schema=public
+      APP_URL: ${APP_URL:?isi APP_URL di .env}
+      SMTP_HOST: ${SMTP_HOST:?isi SMTP_HOST di .env}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:?isi SMTP_FROM di .env}
+    ports:
+      - "${APP_PORT:-8131}:3000"
+    networks: [profiler-internal, npm_default]
+
+volumes:
+  profiler-pgdata:
+
+networks:
+  profiler-internal:
+  npm_default:
+    external: true
